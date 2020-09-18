@@ -1,0 +1,15 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: operators-backend-ingress
+    namespace: blog
+spec:
+    rules:
+        - host: operators.blog.local
+          http:
+            paths:
+              - backend:
+                  serviceName: operators-service
+                  servicePort: 80
+                path: /

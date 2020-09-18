@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: operators-backend
+    labels:
+        app: operators-backend
+    namespace: blog
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: operators-backend
+    template:
+        metadata:
+            labels:
+                app: operators-backend
+        spec:
+            containers:
+                - name: operators-backend-service
+                  image: operators_server:latest
+                  imagePullPolicy: Never
+                  ports:
+                     - containerPort: 7000
+                  env:
+                      - name: DATABASE_ENGINE
+                        value: POSTGRESQL
+                      - name: POSTGRES_DB
+                        value: operators
+                      - name: POSTGRES_USER
+                        value: postgres
+                      - name: POSTGRES_PASSWORD
+                        value: somepassword
+                      - name: POSTGRES_PORT
+                        value: "5432"
+                      - name: POSTGRES_HOST
+                        value: "127.0.0.1"
+
+                - name: operators-backend-db
+                  image: operators_backend_db:latest
+                  imagePullPolicy: Never
