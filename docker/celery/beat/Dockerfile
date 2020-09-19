@@ -22,7 +22,7 @@ RUN pip3 install --upgrade pip
 
 
 # Install other dependencies
-COPY MessageBackend/requirements.txt /opt/
+COPY OperatorsBackend/requirements.txt /opt/
 RUN pip3 install -r /opt/requirements.txt
 
 ########
@@ -35,7 +35,7 @@ RUN apk add --update python3 curl libffi postgresql-libs
 # Copy celery beat
 RUN mkdir -p /opt/celery
 COPY docker/celery/ /opt/celery/
-COPY MessageBackend/ /opt/code/
+COPY OperatorsBackend/ /opt/code/
 
 # Copy the venv with compile dependencies from the compile-image
 COPY --from=compile-image /opt/venv /opt/venv

@@ -23,6 +23,7 @@ services:
         entrypoint: pytest
         depends_on:
             - db
+            - mongodb
             - rabbitmq
         volumes:
             - ./OperatorsBackend:/opt/code
@@ -38,6 +39,7 @@ services:
         entrypoint: pytest
         depends_on:
             - db
+            - mongodb
             - rabbitmq
 
     static-analysis:
@@ -57,7 +59,7 @@ services:
                 # These values should be in sync with environment
                 # for development. If you change them, you'll
                 # need to rebuild the container
-                - POSTGRES_DB=operator
+                - POSTGRES_DB=operators
                 - POSTGRES_USER=postgres
                 - POSTGRES_PASSWORD=somepassword
                 - POSTGRES_PORT=5432
@@ -81,6 +83,23 @@ services:
         ports:
             - "5432:5432"
 
+
+    mongodb:
+        image: mongo:latest
+        restart: always
+        env_file: environment.env
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: mongo
+            MONGO_INITDB_ROOT_PASSWORD: somepassword
+            MONGODB_DB: operators
+            MONGODB_USER: mongo
+            MONGODB_PASSWORD: somepassword
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./docker/mongo/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+
+
     server: &server
         env_file: environment.env
         image: operators_server
@@ -91,8 +110,11 @@ services:
             - "7001:8000"
         depends_on:
             - db
+            - mongodb
             - rabbitmq
             - celery_worker
+            - celery_beat
+
 
     # Rabbit message queue
     rabbitmq:
@@ -104,8 +126,23 @@ services:
         image: celery_terminal
         build:
             context: .
-            dockerfile: docker/celery/Dockerfile
+            dockerfile: docker/celery/worker/Dockerfile
         ports: []
         depends_on: 
             - rabbitmq
             - db
+            - mongodb
+
+    # Celery Beat
+    celery_beat:
+        env_file: environment.env
+        image: celery_beat
+        build:
+            context: .
+            dockerfile: docker/celery/beat/Dockerfile
+        ports: []
+        depends_on: 
+            - rabbitmq
+            - db
+            - mongodb
+            - celery_worker
