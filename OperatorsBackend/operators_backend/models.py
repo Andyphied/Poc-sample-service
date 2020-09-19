@@ -17,6 +17,6 @@ class OperatorModel(db.Model):
     officeAddress = db.Column(db.String(250))
     numberOfVehicle = db.Column(db.String(250))
     status = db.Column(db.String(250))
-    moved = db.Column(db.Integer, default=0)
+    move = db.Column(db.Integer, default=1)
     statusTimestamp = db.Column(db.DateTime)
     timestamp = db.Column(db.DateTime, server_default=func.now())

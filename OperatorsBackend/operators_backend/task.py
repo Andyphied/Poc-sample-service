@@ -23,7 +23,7 @@ def sql_to_mongo():
 
     queries = (OperatorModel
                .query
-               .filter(OperatorModel.moved == 0)
+               .filter(OperatorModel.move > 0)
                .all())
     error = 0
     count = 0
@@ -32,14 +32,24 @@ def sql_to_mongo():
             test = copy.deepcopy(query)
             data_dict = test.__dict__
             data_dict.pop('_sa_instance_state', None)
-            data_dict.pop('moved', None)
-            try:
+            data_dict.pop('move', None)
+            if query.move == 2:
+                _id = data_dict['id']
+                data_dict.pop('id', None)
+                operator = OperatorCollection.objects(id=_id)
+                operator = operator.update(**data_dict)
+
+            if query.move == 1:
                 operator = OperatorCollection(**data_dict)
                 operator.save()
-                query.moved = 1
+
+            try:
+                query.move = 0
                 db.session.add(query)
+
             except Exception:
                 error += 1
+
             count += 1
 
         db.session.commit()
@@ -49,7 +59,7 @@ def sql_to_mongo():
         print('no work to be done, going back to sleep')
 
 
-@celery.task(name='Update Sql')
+@celery.task(name='Update Sql Data')
 def mongo_to_sql():
 
     queries = OperatorCollection.objects(updated=1)
@@ -64,7 +74,7 @@ def mongo_to_sql():
                 operator.status = query.status
                 operator.pin = query.pin
                 query.updated = 0
-                db.session.add()
+                db.session.add(operator)
 
             except Exception:
                 error += 1

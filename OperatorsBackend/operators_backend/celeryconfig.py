@@ -1,5 +1,4 @@
 from celery.schedules import crontab
-from datetime import timedelta
 
 CELERY_TIMEZONE = 'UTC'
 
@@ -9,11 +8,11 @@ CELERY_RESULT_SERILAIZER = 'json'
 
 CELERYBEAT_SCHEDULE = {
     'update mongodb database': {
-        'task': 'New_Data in Mongo',
+        'task': 'Update Mongo',
         'schedule': crontab()
         },
     'update sql database': {
         'task': 'Update Sql Data',
-        'schedule': timedelta(minutes=1)
+        'schedule': crontab(minute=0, hour=0)
         },
     }

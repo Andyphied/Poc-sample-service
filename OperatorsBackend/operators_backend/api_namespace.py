@@ -237,7 +237,7 @@ class OperatorsRetrieve(Resource):
         operator.contactName = args['contactName']
         operator.contactPhoneNo = args['contactPhoneNo']
         operator.contactEmail = args['contactEmail']
-        operator.moved = 0
+        operator.move = 2
 
         db.session.add(operator)
         db.session.commit()
