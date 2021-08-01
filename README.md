@@ -1,4 +1,4 @@
-# Proof of Concept Using an Operator Service (A Microservice)
+# Proof of Concept Using a Sample Service (A Microservice)
 
 That stores and handle any activity that involves operators
 
